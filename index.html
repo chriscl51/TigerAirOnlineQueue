@@ -6,23 +6,21 @@
     <title>台灣虎航 Tigerair Taiwan - 系統排隊中</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 自訂虎航品牌色與動畫 */
         :root {
             --tiger-yellow: #fbad18;
             --tiger-black: #231f20;
         }
-        
+
         body {
             font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
             background-color: #f4f6f8;
-            overflow-x: hidden; /* 防止氣球產生水平捲軸 */
+            overflow-x: hidden;
         }
 
-        /* 飛機沿著路徑飛行的動畫 */
         .flying-plane {
             offset-path: path("M -50 150 Q 400 0 850 150");
             animation: flyPlane 12s linear infinite;
-            offset-rotate: auto; /* 讓機頭自動朝向飛行路徑 */
+            offset-rotate: auto;
         }
 
         @keyframes flyPlane {
@@ -30,7 +28,6 @@
             100% { offset-distance: 100%; }
         }
 
-        /* 安撫文字脈衝動畫 */
         .pulse-text {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
@@ -40,14 +37,13 @@
             50% { opacity: .5; }
         }
 
-        /* --- 氣球小遊戲專屬 CSS --- */
         .balloon-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100vh;
-            pointer-events: none; /* 讓容器不阻擋下方元素的點擊 */
+            pointer-events: none;
             z-index: 40;
             overflow: hidden;
         }
@@ -60,7 +56,7 @@
             background-color: var(--balloon-color, var(--tiger-yellow));
             border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
             box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1);
-            pointer-events: auto; /* 氣球本身可以點擊 */
+            pointer-events: auto;
             cursor: crosshair;
             animation: floatUp linear forwards;
             display: flex;
@@ -69,7 +65,6 @@
             transition: transform 0.1s ease-out, opacity 0.1s ease-out;
         }
 
-        /* 氣球的打結處 */
         .balloon::after {
             content: '';
             position: absolute;
@@ -82,7 +77,6 @@
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
 
-        /* 氣球的線 */
         .balloon::before {
             content: '';
             position: absolute;
@@ -100,14 +94,12 @@
             100% { transform: translateY(-120vh) rotate(-5deg); }
         }
 
-        /* 氣球破掉的特效 */
         .balloon.popped {
             transform: scale(2);
             opacity: 0;
             pointer-events: none;
         }
 
-        /* Modal 動畫 */
         .modal-enter {
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -121,54 +113,89 @@
 <body class="flex flex-col min-h-screen text-gray-800">
 
     <!-- Header 頂部導覽列 -->
-    <header class="bg-[#231f20] p-4 shadow-md flex justify-between items-center border-b-4 border-[#fbad18] relative z-50">
-        <div class="flex items-center">
-            <!-- 替換為上傳的 Logo 圖片，並調整高度放大 -->
-            <img src="tigerlogo.png" alt="Tigerair Taiwan" class="h-16 sm:h-20 w-auto object-contain rounded-md shadow-sm">
+    <header class="bg-[#111111] shadow-lg border-b-[6px] border-[#fbad18] relative z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative flex items-center justify-between py-4 sm:py-5">
+
+                <!-- 左側 Logo -->
+                <div class="flex items-center shrink-0">
+                    <img
+                        src="tigerlogo.png"
+                        alt="Tigerair Taiwan"
+                        class="h-16 sm:h-20 md:h-24 w-auto object-contain"
+                    >
+                </div>
+
+                <!-- 中央提示文字 -->
+                <div class="absolute left-1/2 -translate-x-1/2 text-center w-[60%] hidden sm:block">
+                    <div class="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#1c1c1c] border-2 border-[#fbad18] shadow-md">
+                        <span class="text-[#fbad18] font-black text-lg sm:text-xl md:text-2xl tracking-wide whitespace-nowrap">
+                            虎迷，來玩一下點擊氣球遊戲吧！
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 右側吉祥物 -->
+                <div class="flex items-center shrink-0">
+                    <img
+                        src="hoojiang.png"
+                        alt="虎迷角色"
+                        class="h-16 sm:h-20 md:h-24 w-auto object-contain rounded-lg"
+                    >
+                </div>
+            </div>
         </div>
-        <!-- 遊戲提示 -->
-        <div class="hidden sm:block text-[#fbad18] font-bold text-sm bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
-            🎈 點擊畫面飄浮的氣球，了解行李規定！
+
+        <!-- 手機版中央提示文字 -->
+        <div class="sm:hidden px-4 pb-4 text-center">
+            <div class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-[#1c1c1c] border border-[#fbad18]">
+                <span class="text-[#fbad18] font-black text-base leading-snug">
+                    虎迷，來玩一下點擊氣球遊戲吧！
+                </span>
+            </div>
         </div>
     </header>
 
     <!-- 氣球容器 -->
     <div class="balloon-container" id="balloon-container"></div>
 
-    <!-- 提示彈出視窗 (Modal) - 預設隱藏 -->
+    <!-- 提示彈出視窗 -->
     <div id="tip-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-11/12 overflow-hidden border-2 border-[#fbad18] modal-enter relative">
             <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
             <div class="bg-[#fbad18] text-[#231f20] px-6 py-4 font-black text-lg flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                隨身行李規定提醒
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                ！！給虎迷的重要提醒！！
             </div>
             <div class="p-6">
                 <div id="tip-content" class="text-lg text-gray-700 font-medium leading-relaxed flex items-start">
-                    <!-- 內容由 JS 動態填入 -->
                 </div>
             </div>
             <div class="px-6 pb-6 text-center">
-                <button onclick="closeModal()" class="bg-[#231f20] text-white px-8 py-2 rounded-full font-bold hover:bg-gray-800 transition-colors">我知道了</button>
+                <button onclick="closeModal()" class="bg-[#231f20] text-white px-8 py-2 rounded-full font-bold hover:bg-gray-800 transition-colors">
+                    我知道了
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Main Content 主要內容區 -->
+    <!-- Main Content -->
     <main class="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 relative z-30 pointer-events-none">
-        <!-- 讓中間區塊恢復點擊事件，以免按鈕不能按 -->
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-gray-100 pointer-events-auto relative">
-            
+        <div class="bg-white rounded-2xl shadow-lg w-full max-w-5xl overflow-hidden border border-gray-200 pointer-events-auto relative">
+
             <div class="p-8 text-center bg-gradient-to-b from-yellow-50 to-white">
-                <div class="sm:hidden text-[#fbad18] font-bold text-sm bg-gray-100 px-4 py-2 rounded-full border border-gray-200 mb-4 inline-block">
-                    🎈 點擊飄浮氣球打發時間
-                </div>
-                <h1 class="text-3xl font-bold text-[#231f20] mb-2">請稍候，我們正在為您安排機位...</h1>
-                <p class="text-gray-600 mb-6 text-lg">目前網站湧入大量旅客，您正在排隊等候區。 <br class="hidden sm:block">
-                    <span class="text-red-500 font-bold">⚠️ 請勿關閉或重新整理此頁面</span>，以免重新排隊失去您的位置。</p>
+                <h1 class="text-3xl sm:text-4xl font-bold text-[#231f20] mb-3">
+                    請稍候，我們正在為您安排機位...
+                </h1>
+                <p class="text-gray-600 mb-6 text-lg leading-relaxed">
+                    目前網站湧入大量旅客，您正在排隊等候區。<br class="hidden sm:block">
+                    <span class="text-red-500 font-bold">⚠️ 請勿關閉或重新整理此頁面</span>，以免重新排隊失去您的位置。
+                </p>
 
                 <div class="flex flex-wrap justify-center gap-6 mb-8">
-                    <div class="bg-gray-50 px-8 py-4 rounded-xl border border-gray-200 min-w-[200px] shadow-inner">
+                    <div class="bg-gray-50 px-8 py-4 rounded-xl border border-gray-200 min-w-[220px] shadow-inner">
                         <p class="text-sm text-gray-500 font-bold mb-1">預估等待時間</p>
                         <p class="text-4xl font-black text-[#fbad18]" id="wait-time">05:00</p>
                     </div>
@@ -176,7 +203,6 @@
 
                 <div class="w-full max-w-md mx-auto bg-gray-200 rounded-full h-3 mb-2 overflow-hidden shadow-inner">
                     <div id="progress-bar" class="bg-[#fbad18] h-3 rounded-full transition-all duration-1000 ease-out relative" style="width: 15%">
-                        <!-- 閃光效果 -->
                         <div class="absolute top-0 left-0 bottom-0 right-0 bg-white opacity-20" style="animation: pulse 2s infinite;"></div>
                     </div>
                 </div>
@@ -184,22 +210,18 @@
             </div>
 
             <!-- 動畫區塊 -->
-            <div class="relative w-full bg-[#dcf0f9] border-t-4 border-[#fbad18] flex justify-center items-center py-10 overflow-hidden" style="height: 300px;">
-                <svg viewBox="0 0 800 400" class="w-full h-full max-w-4xl absolute z-10">
-                    
-                    <!-- 背景：載入上傳的台灣虎航插畫地圖 -->
+            <div class="relative w-full bg-[#dcf0f9] border-t-4 border-[#fbad18] flex justify-center items-center py-10 overflow-hidden" style="height: 320px;">
+                <svg viewBox="0 0 800 400" class="w-full h-full max-w-5xl absolute z-10">
+
                     <g id="globe">
                         <image href="tigerair map.jpg" x="0" y="0" width="800" height="400" preserveAspectRatio="xMidYMid meet" />
                     </g>
 
-                    <!-- 載入上傳的老虎飛機去背圖片(PNG) - 沿著隱形軌跡飛行 -->
-                    <g class="flying-plane" transform="translate(0, -30)"> 
-                        <!-- 調整 x, y 與寬高來縮放飛機圖片，使其大小適中 (-75, -35 分別為寬高的一半，用以置中) -->
+                    <g class="flying-plane" transform="translate(0, -30)">
                         <image href="tigerairplane.png" x="-75" y="-35" width="150" height="70" preserveAspectRatio="xMidYMid meet" />
                     </g>
                 </svg>
             </div>
-            
         </div>
 
         <div class="mt-8 text-center text-sm text-gray-500 pointer-events-auto">
@@ -216,13 +238,11 @@
         &copy; 2026 Tigerair Taiwan. All rights reserved. 此為作業範例網頁，非官方實際頁面。
     </footer>
 
-    <!-- JavaScript 互動邏輯 -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // --- 1. 排隊進度邏輯 ---
             let totalSeconds = 5 * 60;
             const totalStartSeconds = totalSeconds;
-            
+
             const timeElement = document.getElementById('wait-time');
             const progressBar = document.getElementById('progress-bar');
 
@@ -245,66 +265,55 @@
                     timeElement.innerText = "即將進入";
                     progressBar.style.width = "100%";
                     setTimeout(() => {
-                        // 建立一個客製化彈窗代替原生 alert
                         const tipContent = document.getElementById('tip-content');
-                        tipContent.innerHTML = `<span class="text-green-600 text-2xl mr-3">✈️</span> <span class="pt-1">感謝您的耐心等候！現在為您跳轉至購票頁面。</span>`;
+                        tipContent.innerHTML = `
+                            <span class="text-green-600 text-2xl mr-3">✈️</span>
+                            <span class="pt-1">感謝虎迷的耐心等候！即將進入購票頁面（務必確認護照效期）。</span>
+                        `;
                         document.getElementById('tip-modal').classList.remove('hidden');
                     }, 1000);
                 }
             }, 1000);
 
-            // --- 2. 行李規定氣球小遊戲邏輯 ---
-            
-            // 7 項行李規定資料陣列
             const luggageTips = [
-                { icon: "💧", text: "液體、噴霧、膠狀物：單瓶容器超過 100ml者禁止隨身攜帶，須放入透明密封袋（總量不超過1公升），容器大於 100ml即使未裝滿也不行。" },
+                { icon: "💧", text: "液體、噴霧、膠狀物：單瓶容器超過 100ml 者禁止隨身攜帶，須放入透明密封袋（總量不超過 1 公升），容器大於 100ml 即使未裝滿也不行。" },
                 { icon: "✂️", text: "刀具與尖銳物品：美工刀、水果刀、剪刀、弓箭、飛鏢、金屬針頭等。" },
-                { icon: "🏏", text: "工具與棍棒類（管徑 >1cm 且長度 >60cm）。" },
+                { icon: "🏏", text: "工具與棍棒類（管徑 > 1cm 且長度 > 60cm）。" },
                 { icon: "🚫", text: "防狼噴霧禁止手提與託運。" },
                 { icon: "🧳", text: "行動電源與鋰電池規定絕對禁止託運。" },
-                { icon: "🔋", text: "行動電源數量規定：每人限帶2 顆：不論電容量大小（只要在160Wh 以下），超過160Wh 絕對禁止。" },
-                { icon: "⚖️", text: "手提行李若超重（超過10公斤）或超過尺寸，在登機門將收取約新台幣2,000元的行李託運費用。" }
+                { icon: "🔋", text: "行動電源數量規定：每人限帶 2 顆；不論電容量大小，只要在 160Wh 以下，超過 160Wh 絕對禁止。" },
+                { icon: "⚖️", text: "手提行李若超重（超過 10 公斤）或超過尺寸，在登機門將收取約新台幣 2,000 元的行李託運費用。" }
             ];
 
             const balloonContainer = document.getElementById('balloon-container');
             const modal = document.getElementById('tip-modal');
             const tipContent = document.getElementById('tip-content');
-            
-            // 關閉 Modal 的全域函數
+
             window.closeModal = function() {
                 modal.classList.add('hidden');
-            }
+            };
 
-            // 生成氣球
             function createBalloon() {
                 const balloon = document.createElement('div');
                 balloon.classList.add('balloon');
-                
-                // 七彩氣球隨機配色
+
                 const rainbowColors = ['#FF5252', '#FF9800', '#FFEB3B', '#4CAF50', '#2196F3', '#9C27B0', '#E040FB'];
                 const randomColor = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
                 balloon.style.setProperty('--balloon-color', randomColor);
 
-                // 隨機水平位置 (避開邊緣)
                 const randomX = Math.floor(Math.random() * 80) + 10;
                 balloon.style.left = `${randomX}%`;
-                
-                // 隨機飛行速度 (7秒 到 12秒)
+
                 const duration = Math.floor(Math.random() * 5) + 7;
                 balloon.style.animationDuration = `${duration}s`;
 
-                // 點擊事件：氣球破掉並顯示提示
-                balloon.addEventListener('mousedown', (e) => {
-                    // 防止重複點擊
-                    if(balloon.classList.contains('popped')) return;
-                    
-                    // 氣球破裂動畫
+                balloon.addEventListener('mousedown', () => {
+                    if (balloon.classList.contains('popped')) return;
+
                     balloon.classList.add('popped');
-                    
-                    // 隨機抽取一條規定
+
                     const randomTip = luggageTips[Math.floor(Math.random() * luggageTips.length)];
-                    
-                    // 組合提示內容 (圖示 + ✖️ + 文字)
+
                     tipContent.innerHTML = `
                         <div class="flex items-start">
                             <span class="text-3xl mr-2">${randomTip.icon}</span>
@@ -312,15 +321,11 @@
                             <span class="pt-1">${randomTip.text}</span>
                         </div>
                     `;
-                    
-                    // 顯示 Modal
+
                     modal.classList.remove('hidden');
-                    
-                    // 動畫結束後移除節點
                     setTimeout(() => balloon.remove(), 200);
                 });
 
-                // 動畫結束後若沒被點擊則自動移除節點 (防止 DOM 元素過多)
                 balloon.addEventListener('animationend', () => {
                     balloon.remove();
                 });
@@ -328,12 +333,9 @@
                 balloonContainer.appendChild(balloon);
             }
 
-            // 設定定時器，每隔一段時間生成一個氣球
-            // 根據螢幕寬度決定氣球產生頻率
             const spawnRate = window.innerWidth > 600 ? 1500 : 2500;
             setInterval(createBalloon, spawnRate);
-            
-            // 初始先產生 2 顆氣球
+
             setTimeout(createBalloon, 500);
             setTimeout(createBalloon, 1500);
         });
