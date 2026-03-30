@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣虎航 Tigerair Taiwan - 系統排隊中</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自訂虎航品牌色與動畫 */
+        :root {
+            --tiger-yellow: #fbad18;
+            --tiger-black: #231f20;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        /* 飛機沿著路徑飛行的動畫 */
+        /* 使用 offset-path 讓飛機沿著隱形的虛線路徑飛行，將路徑往上移並呈現漂亮弧線 */
+        .flying-plane {
+            offset-path: path("M -50 250 Q 400 100 850 150");
+            animation: flyPlane 16s linear infinite;
+        }
+
+        @keyframes flyPlane {
+            0% { offset-distance: 0%; }
+            100% { offset-distance: 100%; }
+        }
+
+        /* 簡單的脈衝動畫用於安撫文字 */
+        .pulse-text {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-gray-800">
+
+    <!-- Header 頂部導覽列 -->
+    <header class="bg-white p-4 shadow-md flex justify-between items-center border-b-4 border-[#fbad18]">
+        <div class="flex items-center">
+            <img src="tigerlogo.png" alt="Tigerair Taiwan" class="h-24 w-auto rounded-md">
+        </div>
+        <div></div>
+    </header>
+
+    <!-- Main Content 主要內容區 -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 sm:p-8">
+        
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-gray-100">
+            
+            <!-- 上半部：安撫訊息與進度 -->
+            <div class="p-8 text-center bg-gradient-to-b from-yellow-50 to-white">
+                <h1 class="text-3xl font-bold text-[#231f20] mb-2">請稍候，我們正在為您安排最佳航線...</h1>
+                <p class="text-gray-600 mb-6 text-lg">目前網站湧入大量旅客，您已進入專屬排隊等候區。 <br class="hidden sm:block">
+                   <span class="text-red-500 font-bold">⚠️ 請勿關閉或重新整理此頁面</span>，以免重新排隊失去您的位置。</p>
+
+                <!-- 數據面板 -->
+                <div class="flex flex-wrap justify-center gap-6 mb-8">
+                    <div class="bg-gray-50 px-6 py-4 rounded-xl border border-gray-200 min-w-[150px]">
+                        <p class="text-sm text-gray-500 font-bold mb-1">前方排隊人數</p>
+                        <p class="text-3xl font-black text-[#231f20]" id="queue-number">3,452</p>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-4 rounded-xl border border-gray-200 min-w-[150px]">
+                        <p class="text-sm text-gray-500 font-bold mb-1">預估等待時間</p>
+                        <p class="text-3xl font-black text-[#fbad18]" id="wait-time">05:00</p>
+                    </div>
+                </div>
+
+                <!-- 進度條 -->
+                <div class="w-full max-w-md mx-auto bg-gray-200 rounded-full h-3 mb-2 overflow-hidden">
+                    <div id="progress-bar" class="bg-[#fbad18] h-3 rounded-full transition-all duration-1000 ease-out" style="width: 15%"></div>
+                </div>
+                <p class="pulse-text text-sm text-gray-500 font-medium">系統自動更新中，請耐心等候</p>
+            </div>
+
+            <!-- 下半部：視覺動畫區 (地圖、飛機、軌跡) -->
+            <!-- 將背景改為配合地圖的淺藍色 bg-[#dcf0f9] -->
+            <div class="relative w-full bg-[#dcf0f9] border-t-4 border-[#fbad18] flex justify-center items-center py-10 overflow-hidden" style="height: 300px;">
+                
+                <!-- SVG 動畫區塊 -->
+                <svg viewBox="0 0 800 400" class="w-full h-full max-w-4xl absolute z-10">
+                    
+                    <!-- 背景：載入上傳的台灣虎航插畫地圖 -->
+                    <g id="globe">
+                        <image href="tigerair map.jpg" x="0" y="0" width="800" height="400" preserveAspectRatio="xMidYMid meet" />
+                    </g>
+
+                    <!-- 載入上傳的老虎飛機去背圖片(PNG) - 沿著隱形軌跡飛行 -->
+                    <g class="flying-plane" transform="translate(0, -30)"> 
+                        <!-- 調整 x, y 與寬高來縮放飛機圖片，使其大小適中 (-75, -35 分別為寬高的一半，用以置中) -->
+                        <image href="tigerairplane.png" x="-140" y="-75" width="280" height="150" preserveAspectRatio="xMidYMid meet" />
+                    </g>
+                </svg>
+            </div>
+            
+        </div>
+
+        <!-- 聯絡與客服資訊 -->
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p>如果您有緊急行程或需更改現有訂單，請利用以下管道聯繫我們：</p>
+            <div class="flex justify-center gap-4 mt-2">
+                <a href="#" class="text-[#fbad18] hover:underline font-bold">線上智能客服</a>
+                <span>|</span>
+                <a href="#" class="text-[#fbad18] hover:underline font-bold">查看最新航班異動公告</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#231f20] text-center p-4 text-xs text-gray-400">
+        &copy; 2026 Tigerair Taiwan. All rights reserved. 此為作業範例網頁，非官方實際頁面。
+    </footer>
+
+    <!-- JavaScript 互動邏輯 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 初始設定
+            let queueCount = 3452;
+            let totalSeconds = 5 * 60; // 5分鐘
+            const totalStartSeconds = totalSeconds;
+            
+            const queueElement = document.getElementById('queue-number');
+            const timeElement = document.getElementById('wait-time');
+            const progressBar = document.getElementById('progress-bar');
+
+            // 格式化時間 (MM:SS)
+            function formatTime(seconds) {
+                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                return `${m}:${s}`;
+            }
+
+            // 更新倒數與排隊人數
+            const interval = setInterval(() => {
+                // 減少時間
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    timeElement.innerText = formatTime(totalSeconds);
+                    
+                    // 計算進度條百分比 (從 15% 慢慢增加到 100%)
+                    const progress = 15 + ((totalStartSeconds - totalSeconds) / totalStartSeconds) * 85;
+                    progressBar.style.width = `${progress}%`;
+                }
+
+                // 隨機減少排隊人數 (營造真實感，每次減少 1~5 人)
+                if (queueCount > 10 && Math.random() > 0.3) {
+                    const decrease = Math.floor(Math.random() * 5) + 1;
+                    queueCount -= decrease;
+                    // 加入千分位逗號
+                    queueElement.innerText = queueCount.toLocaleString();
+                }
+
+                // 當時間到或人數歸零時的模擬行為
+                if (totalSeconds <= 0 || queueCount <= 0) {
+                    clearInterval(interval);
+                    queueElement.innerText = "0";
+                    timeElement.innerText = "即將進入";
+                    progressBar.style.width = "100%";
+                    setTimeout(() => {
+                        alert("排隊完成！即將為您重新導向至購票頁面。");
+                    }, 1000);
+                }
+            }, 1000); // 每秒更新一次
+        });
+    </script>
+</body>
+</html>
