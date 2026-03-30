@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>台灣虎航 Tigerair Taiwan - 系統排隊中</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -112,7 +112,7 @@
 </head>
 <body class="flex flex-col min-h-screen text-gray-800">
 
-    <!-- Header 頂部導覽列 -->
+    <!-- Header -->
     <header class="bg-[#111111] shadow-lg border-b-[6px] border-[#fbad18] relative z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="relative flex items-center justify-between py-4 sm:py-5">
@@ -123,7 +123,7 @@
                         src="tigerlogo.png"
                         alt="Tigerair Taiwan"
                         class="h-16 sm:h-20 md:h-24 w-auto object-contain"
-                    >
+                    />
                 </div>
 
                 <!-- 中央提示文字 -->
@@ -141,7 +141,7 @@
                         src="hoojiang.png"
                         alt="虎迷角色"
                         class="h-16 sm:h-20 md:h-24 w-auto object-contain rounded-lg"
-                    >
+                    />
                 </div>
             </div>
         </div>
@@ -159,20 +159,41 @@
     <!-- 氣球容器 -->
     <div class="balloon-container" id="balloon-container"></div>
 
+    <!-- 預載音效 -->
+    <audio id="catSound" preload="auto">
+        <source src="cat-meow.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="tigerSound" preload="auto">
+        <source src="tiger-roar.mp3" type="audio/mpeg" />
+    </audio>
+
     <!-- 提示彈出視窗 -->
     <div id="tip-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-11/12 overflow-hidden border-2 border-[#fbad18] modal-enter relative">
-            <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-800 text-2xl font-bold">&times;</button>
-            <div class="bg-[#fbad18] text-[#231f20] px-6 py-4 font-black text-lg flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
-                ！！給虎迷的重要提醒！！
-            </div>
-            <div class="p-6">
-                <div id="tip-content" class="text-lg text-gray-700 font-medium leading-relaxed flex items-start">
+            <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-800 text-2xl font-bold z-10">
+                &times;
+            </button>
+
+            <div class="bg-[#fbad18] text-[#231f20] px-6 py-4 font-black text-xl">
+                <div class="flex items-center justify-center gap-3 text-center pr-10">
+                    <svg class="w-7 h-7 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+
+                    <span class="text-center leading-snug">！！給虎迷的重要提醒！！</span>
+
+                    <svg class="w-7 h-7 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
                 </div>
             </div>
+
+            <div class="p-6">
+                <div id="tip-content" class="text-lg text-gray-700 font-medium leading-relaxed flex items-start justify-center">
+                    <!-- JS 動態填入 -->
+                </div>
+            </div>
+
             <div class="px-6 pb-6 text-center">
                 <button onclick="closeModal()" class="bg-[#231f20] text-white px-8 py-2 rounded-full font-bold hover:bg-gray-800 transition-colors">
                     我知道了
@@ -190,14 +211,14 @@
                     請稍候，我們正在為您安排機位...
                 </h1>
                 <p class="text-gray-600 mb-6 text-lg leading-relaxed">
-                    目前網站湧入大量旅客，您正在排隊等候區。<br class="hidden sm:block">
+                    目前網站湧入大量旅客，您正在排隊等候區。<br class="hidden sm:block" />
                     <span class="text-red-500 font-bold">⚠️ 請勿關閉或重新整理此頁面</span>，以免重新排隊失去您的位置。
                 </p>
 
                 <div class="flex flex-wrap justify-center gap-6 mb-8">
                     <div class="bg-gray-50 px-8 py-4 rounded-xl border border-gray-200 min-w-[220px] shadow-inner">
                         <p class="text-sm text-gray-500 font-bold mb-1">預估等待時間</p>
-                        <p class="text-4xl font-black text-[#fbad18]" id="wait-time">05:00</p>
+                        <p class="text-4xl font-black text-[#fbad18]" id="wait-time">01:00</p>
                     </div>
                 </div>
 
@@ -212,7 +233,6 @@
             <!-- 動畫區塊 -->
             <div class="relative w-full bg-[#dcf0f9] border-t-4 border-[#fbad18] flex justify-center items-center py-10 overflow-hidden" style="height: 320px;">
                 <svg viewBox="0 0 800 400" class="w-full h-full max-w-5xl absolute z-10">
-
                     <g id="globe">
                         <image href="tigerair map.jpg" x="0" y="0" width="800" height="400" preserveAspectRatio="xMidYMid meet" />
                     </g>
@@ -240,7 +260,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            let totalSeconds = 5 * 60;
+            let totalSeconds = 1 * 60;
             const totalStartSeconds = totalSeconds;
 
             const timeElement = document.getElementById('wait-time');
@@ -250,6 +270,20 @@
                 const m = Math.floor(seconds / 60).toString().padStart(2, '0');
                 const s = (seconds % 60).toString().padStart(2, '0');
                 return `${m}:${s}`;
+            }
+
+            function playRandomAnimalSound() {
+                const sounds = ['catSound', 'tigerSound'];
+                const randomId = sounds[Math.floor(Math.random() * sounds.length)];
+                const baseAudio = document.getElementById(randomId);
+
+                if (!baseAudio) return;
+
+                const sound = baseAudio.cloneNode(true);
+                sound.volume = 0.9;
+                sound.play().catch(err => {
+                    console.warn('音效播放失敗：', err);
+                });
             }
 
             const interval = setInterval(() => {
@@ -264,11 +298,19 @@
                     clearInterval(interval);
                     timeElement.innerText = "即將進入";
                     progressBar.style.width = "100%";
+
                     setTimeout(() => {
                         const tipContent = document.getElementById('tip-content');
                         tipContent.innerHTML = `
-                            <span class="text-green-600 text-2xl mr-3">✈️</span>
-                            <span class="pt-1">感謝虎迷的耐心等候！即將進入購票頁面（務必確認護照效期）。</span>
+                            <div class="w-full text-center">
+                                <div class="flex items-center justify-center text-gray-700 text-2xl sm:text-3xl font-bold leading-relaxed">
+                                    <span class="mr-3">✈️</span>
+                                    <span>感謝虎迷的耐心等候！即將進入購票頁面</span>
+                                </div>
+                                <div class="mt-4 text-red-500 text-xl sm:text-2xl font-black text-center">
+                                    （務必確認護照效期）
+                                </div>
+                            </div>
                         `;
                         document.getElementById('tip-modal').classList.remove('hidden');
                     }, 1000);
@@ -311,14 +353,17 @@
                     if (balloon.classList.contains('popped')) return;
 
                     balloon.classList.add('popped');
+                    playRandomAnimalSound();
 
                     const randomTip = luggageTips[Math.floor(Math.random() * luggageTips.length)];
 
                     tipContent.innerHTML = `
-                        <div class="flex items-start">
-                            <span class="text-3xl mr-2">${randomTip.icon}</span>
-                            <span class="text-red-500 font-black text-2xl mr-2 mt-1">✖️</span>
-                            <span class="pt-1">${randomTip.text}</span>
+                        <div class="w-full">
+                            <div class="flex items-start justify-center text-left">
+                                <span class="text-3xl mr-2">${randomTip.icon}</span>
+                                <span class="text-red-500 font-black text-2xl mr-2 mt-1">✖️</span>
+                                <span class="pt-1 text-lg leading-relaxed">${randomTip.text}</span>
+                            </div>
                         </div>
                     `;
 
