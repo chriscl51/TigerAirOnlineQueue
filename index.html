@@ -163,8 +163,13 @@
     <audio id="catSound" preload="auto">
         <source src="cat-meow.mp3" type="audio/mpeg" />
     </audio>
+
     <audio id="tigerSound" preload="auto">
         <source src="tiger-roar.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="enterSound" preload="auto">
+        <source src="enter-booking.mp3" type="audio/mpeg" />
     </audio>
 
     <!-- 提示彈出視窗 -->
@@ -195,7 +200,11 @@
             </div>
 
             <div class="px-6 pb-6 text-center">
-                <button onclick="closeModal()" class="bg-[#231f20] text-white px-8 py-2 rounded-full font-bold hover:bg-gray-800 transition-colors">
+                <button
+                    id="modal-action-btn"
+                    onclick="handleModalAction()"
+                    class="bg-[#231f20] text-white px-8 py-2 rounded-full font-bold hover:bg-gray-800 transition-colors"
+                >
                     我知道了
                 </button>
             </div>
@@ -210,6 +219,7 @@
                 <h1 class="text-3xl sm:text-4xl font-bold text-[#231f20] mb-3">
                     請稍候，我們正在為您安排機位...
                 </h1>
+
                 <p class="text-gray-600 mb-6 text-lg leading-relaxed">
                     目前網站湧入大量旅客，您正在排隊等候區。<br class="hidden sm:block" />
                     <span class="text-red-500 font-bold">⚠️ 請勿關閉或重新整理此頁面</span>，以免重新排隊失去您的位置。
@@ -227,6 +237,7 @@
                         <div class="absolute top-0 left-0 bottom-0 right-0 bg-white opacity-20" style="animation: pulse 2s infinite;"></div>
                     </div>
                 </div>
+
                 <p class="pulse-text text-sm text-gray-500 font-medium">系統自動更新中，請耐心等候</p>
             </div>
 
@@ -265,6 +276,12 @@
 
             const timeElement = document.getElementById('wait-time');
             const progressBar = document.getElementById('progress-bar');
+            const balloonContainer = document.getElementById('balloon-container');
+            const modal = document.getElementById('tip-modal');
+            const tipContent = document.getElementById('tip-content');
+            const modalActionBtn = document.getElementById('modal-action-btn');
+
+            let isQueueFinishedModal = false;
 
             function formatTime(seconds) {
                 const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -272,19 +289,69 @@
                 return `${m}:${s}`;
             }
 
+            function playClonedAudio(audioId, volume = 0.9) {
+                const baseAudio = document.getElementById(audioId);
+                if (!baseAudio) return null;
+
+                const sound = baseAudio.cloneNode(true);
+                sound.volume = volume;
+                return sound;
+            }
+
             function playRandomAnimalSound() {
                 const sounds = ['catSound', 'tigerSound'];
                 const randomId = sounds[Math.floor(Math.random() * sounds.length)];
-                const baseAudio = document.getElementById(randomId);
+                const sound = playClonedAudio(randomId, 0.9);
 
-                if (!baseAudio) return;
+                if (!sound) return;
 
-                const sound = baseAudio.cloneNode(true);
-                sound.volume = 0.9;
                 sound.play().catch(err => {
                     console.warn('音效播放失敗：', err);
                 });
             }
+
+            function playEnterSoundAndGo() {
+                const sound = playClonedAudio('enterSound', 0.95);
+                const targetUrl = "booking.html";
+
+                if (!sound) {
+                    window.location.href = targetUrl;
+                    return;
+                }
+
+                let hasNavigated = false;
+
+                const goNext = () => {
+                    if (hasNavigated) return;
+                    hasNavigated = true;
+                    window.location.href = targetUrl;
+                };
+
+                sound.addEventListener('ended', goNext, { once: true });
+
+                sound.play()
+                    .then(() => {
+                        setTimeout(goNext, 1500);
+                    })
+                    .catch(err => {
+                        console.warn('進場音效播放失敗：', err);
+                        goNext();
+                    });
+            }
+
+            window.closeModal = function() {
+                modal.classList.add('hidden');
+                isQueueFinishedModal = false;
+                modalActionBtn.textContent = '我知道了';
+            };
+
+            window.handleModalAction = function() {
+                if (isQueueFinishedModal) {
+                    playEnterSoundAndGo();
+                } else {
+                    closeModal();
+                }
+            };
 
             const interval = setInterval(() => {
                 if (totalSeconds > 0) {
@@ -300,7 +367,9 @@
                     progressBar.style.width = "100%";
 
                     setTimeout(() => {
-                        const tipContent = document.getElementById('tip-content');
+                        isQueueFinishedModal = true;
+                        modalActionBtn.textContent = '進入購票頁面';
+
                         tipContent.innerHTML = `
                             <div class="w-full text-center">
                                 <div class="flex items-center justify-center text-gray-700 text-2xl sm:text-3xl font-bold leading-relaxed">
@@ -312,7 +381,8 @@
                                 </div>
                             </div>
                         `;
-                        document.getElementById('tip-modal').classList.remove('hidden');
+
+                        modal.classList.remove('hidden');
                     }, 1000);
                 }
             }, 1000);
@@ -326,14 +396,6 @@
                 { icon: "🔋", text: "行動電源數量規定：每人限帶 2 顆；不論電容量大小，只要在 160Wh 以下，超過 160Wh 絕對禁止。" },
                 { icon: "⚖️", text: "手提行李若超重（超過 10 公斤）或超過尺寸，在登機門將收取約新台幣 2,000 元的行李託運費用。" }
             ];
-
-            const balloonContainer = document.getElementById('balloon-container');
-            const modal = document.getElementById('tip-modal');
-            const tipContent = document.getElementById('tip-content');
-
-            window.closeModal = function() {
-                modal.classList.add('hidden');
-            };
 
             function createBalloon() {
                 const balloon = document.createElement('div');
@@ -356,6 +418,8 @@
                     playRandomAnimalSound();
 
                     const randomTip = luggageTips[Math.floor(Math.random() * luggageTips.length)];
+                    isQueueFinishedModal = false;
+                    modalActionBtn.textContent = '我知道了';
 
                     tipContent.innerHTML = `
                         <div class="w-full">
